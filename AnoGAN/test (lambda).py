@@ -1,22 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-from torchvision import datasets, transforms
-from torch.autograd import Variable
+from torchvision import transforms
 
 import time
 import numpy as np
 import argparse
-import datetime
-import itertools
-import seaborn as sns
-from sklearn import metrics
-from matplotlib import pyplot as plt
 
-import modules
 from utils import dataset
-from imp import reload
 from modules import generator, discriminator
 
 
@@ -28,41 +19,37 @@ parser.add_argument('-gm', '--gen_model', default='./data', help='path to the ge
 parser.add_argument('-dm', '--dis_model', default='./data', help='path to the dis dis_model')
 parser.add_argument('-lr', '--learning_rate', type=float, default=1e-4, help='learning rate')
 parser.add_argument('-z', '--latent_size', type=int, default=200, help='latent size')
-parser.add_argument('-sm','--save_path', default='./results/')
+parser.add_argument('-sm', '--save_path', default='./results/')
 
 args = parser.parse_args()
 
 normalize = transforms.Normalize((0.5, 0.5, 0.5), 
                                  (0.5, 0.5, 0.5))
-transform = transforms.Compose([transforms.Resize((256,256)),
+transform = transforms.Compose([transforms.Resize((256, 256)),
                                 transforms.RandomHorizontalFlip(),
                                 transforms.RandomVerticalFlip(),
                                 transforms.RandomCrop(220),
                                 transforms.ToTensor(),
                                 normalize])
 norm_transform = transforms.Compose([transforms.ToTensor(),
-                                normalize])
-test_transform = transforms.Compose([transforms.Resize((256,256)),
-                                transforms.FiveCrop(220),
-                                transforms.Lambda(lambda crops: torch.stack([norm_transform(crop)
-                                for crop in crops]))
-                                ])
+                                     normalize])
+test_transform = transforms.Compose([transforms.Resize((256, 256)),
+                                     transforms.FiveCrop(220),
+                                     transforms.Lambda(lambda crops: torch.stack(
+                                                       [norm_transform(crop) for crop in crops]))])
 
-training_data = dataset.ImageFolderPaths('./data/train', transform = transform)
-test_data = dataset.ImageFolderPaths('./data/test/', transform = test_transform)
-
+training_data = dataset.ImageFolderPaths('./data/train', transform=transform)
+test_data = dataset.ImageFolderPaths('./data/test/', transform=test_transform)
 
 data_loader = torch.utils.data.DataLoader(training_data,
-                                          batch_size= 16,
+                                          batch_size=16,
                                           shuffle=True,
-                                          num_workers= 0)
+                                          num_workers=0)
 
 test_loader = torch.utils.data.DataLoader(test_data,
-                                          batch_size= 1,
+                                          batch_size=1,
                                           shuffle=True,
-                                          num_workers= 1)
-
-
+                                          num_workers=1)
 
 beta1 = 0.5
 beta2 = 0.999
@@ -100,8 +87,8 @@ def query_noise(query_im, dis, gen, lam):
 lams = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 for lam in lams:
     start_time = time.time()
-    loss_neg = torch.zeros((30,1)).cuda()
-    loss_pos = torch.zeros((130,1)).cuda()
+    loss_neg = torch.zeros((30, 1)).cuda()
+    loss_pos = torch.zeros((130, 1)).cuda()
     c_neg = c_pos = 0
     for step, (images, labels, path) in enumerate(test_loader, 0):
         images = images.view(-1, 3, 220, 220)
@@ -115,16 +102,16 @@ for lam in lams:
         else:
             loss_pos[c_pos] = loss_test.detach()
             c_pos += 1
-        print ('image path %s, loss test: %.2f' %(str(path), loss_test))
+        print('image path %s, loss test: %.2f' %(str(path), loss_test))
 
     end_time = time.time() - start_time
-    print ('time :', end_time)
+    print('time :', end_time)
     print(lam)
-    print ('mean negative: %0.4f, std negative: %0.4f' %(torch.mean(loss_neg), torch.std(loss_neg)))
-    print ('mean positive: %0.4f, std positive: %0.4f' %(torch.mean(loss_pos), torch.std(loss_pos)))
+    print('mean negative: %0.4f, std negative: %0.4f' %(torch.mean(loss_neg), torch.std(loss_neg)))
+    print('mean positive: %0.4f, std positive: %0.4f' %(torch.mean(loss_pos), torch.std(loss_pos)))
 
     lneg = loss_neg.detach().cpu().numpy()
     lpos = loss_pos.detach().cpu().numpy()
 
-    np.save(args.save_path+'lneg'+str(lam)+'.npy',lneg)
-    np.save(args.save_path+'lpos'+str(lam)+'.npy',lpos)
+    np.save(args.save_path+'lneg'+str(lam)+'.npy', lneg)
+    np.save(args.save_path+'lpos'+str(lam)+'.npy', lpos)

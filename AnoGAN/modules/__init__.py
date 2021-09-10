@@ -1,2 +1,1 @@
-from .generator import *
-from .discriminator import *
+from .model import *

@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from .spectral_normalization import SpectralNorm
 
-##################  Generator, Encoder, Discriminator for Leukemia dataset size 3 * 220 * 220
+#  Generator, Encoder, Discriminator for Leukemia dataset size 3 * 220 * 220
+
 
 class Generator_Leukemia(nn.Module):
-
     def __init__(self, latent_size):
         super(Generator_Leukemia, self).__init__()
         self.latent_size = latent_size
@@ -51,12 +50,10 @@ class Generator_Leukemia(nn.Module):
     def forward(self, input):
         output = self.main(input)
         # output = torch.sigmoid(output + self.output_bias)
-        # print ('Generator output size: ', output.shape)
         return output
 
 
 class Encoder_Leukemia(nn.Module):
-
     def __init__(self, latent_size, noise=False):
         super(Encoder_Leukemia, self).__init__()
         self.latent_size = latent_size
@@ -106,17 +103,14 @@ class Encoder_Leukemia(nn.Module):
         )
 
     def forward(self, input):
-        batch_size = input.size()[0]
         x1 = self.main1(input)
         x2 = self.main2(x1)
         x3 = self.main3(x2)
         output = self.main4(x3)
-        # print ('Encoder output size: ', output.shape)
         return output
 
 
 class Discriminator_xz_Leukemia(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1):
         super(Discriminator_xz_Leukemia, self).__init__()
         self.latent_size = latent_size
@@ -181,13 +175,10 @@ class Discriminator_xz_Leukemia(nn.Module):
         output_z = self.infer_z(z)
         itermediate_layer = self.infer_joint(torch.cat([output_x, output_z], dim=1))
         logit = self.logit(itermediate_layer)
-        # print (itermediate_layer.shape)
-        # print (logit.squeeze().shape)
         return logit.squeeze(), itermediate_layer
 
 
 class Discriminator_xx_Leukemia(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1, do_spectral_norm=True):
         super(Discriminator_xx_Leukemia, self).__init__()
         self.latent_size = latent_size
@@ -242,6 +233,7 @@ class Discriminator_zz_Leukemia(nn.Module):
             SpectralNorm(nn.Linear(32, 1)),
             nn.LeakyReLU(self.leaky_value, inplace=True)
             )
+
     def forward(self, z, z_prime):
         z = torch.cat((z, z_prime), 0)
         itermediate_layer = self.joint_zz(z.view(z.shape[0], -1))
@@ -249,10 +241,9 @@ class Discriminator_zz_Leukemia(nn.Module):
         return logit.squeeze(), itermediate_layer
 
 
-################################ MNIST dataset (1, 28, 28)
+# MNIST dataset (1, 28, 28)
 
 class Generator_MNIST(nn.Module):
-
     def __init__(self, latent_size):
         super(Generator_MNIST, self).__init__()
         self.latent_size = latent_size
@@ -289,7 +280,6 @@ class Generator_MNIST(nn.Module):
 
 
 class Encoder_MNIST(nn.Module):
-
     def __init__(self, latent_size, noise=False):
         super(Encoder_MNIST, self).__init__()
         self.latent_size = latent_size
@@ -318,7 +308,6 @@ class Encoder_MNIST(nn.Module):
         )
 
     def forward(self, input):
-        batch_size = input.size()[0]
         x1 = self.main1(input)
         x2 = self.main2(x1)
         x3 = self.main3(x2)
@@ -328,7 +317,6 @@ class Encoder_MNIST(nn.Module):
 
 
 class Discriminator_xz_MNIST(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1, do_spectral_norm=True):
         super(Discriminator_xz_MNIST, self).__init__()
         self.latent_size = latent_size
@@ -362,13 +350,13 @@ class Discriminator_xz_MNIST(nn.Module):
     def forward(self, x, z):
         output_x = self.infer_x(x)
         output_z = self.infer_z(z)
-        itermediate_layer = self.infer_joint(torch.cat([output_x.view(output_x.shape[0], -1), output_z.view(output_z.shape[0], -1)], dim=1))
+        itermediate_layer = self.infer_joint(torch.cat([output_x.view(output_x.shape[0], -1),
+                                             output_z.view(output_z.shape[0], -1)], dim=1))
         logit = self.logit(itermediate_layer)
         return logit.squeeze(), itermediate_layer
 
 
 class Discriminator_xx_MNIST(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1, do_spectral_norm=True):
         super(Discriminator_xx_MNIST, self).__init__()
         self.latent_size = latent_size
@@ -396,7 +384,6 @@ class Discriminator_xx_MNIST(nn.Module):
 
 
 class Discriminator_zz_MNIST(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1, do_spectral_norm=True):
         super(Discriminator_zz_MNIST, self).__init__()
         self.latent_size = latent_size
@@ -415,6 +402,7 @@ class Discriminator_zz_MNIST(nn.Module):
             SpectralNorm(nn.Linear(32, 1)),
             nn.LeakyReLU(self.leaky_value, inplace=True)
             )
+
     def forward(self, z, z_prime):
         z = torch.cat((z, z_prime), 0)
         itermediate_layer = self.joint_zz(z.view(z.shape[0], -1))
@@ -422,10 +410,9 @@ class Discriminator_zz_MNIST(nn.Module):
         return logit.squeeze(), itermediate_layer
 
 
-##################################### CIFAR10 dataset (3, 32, 32)
+# CIFAR10 dataset (3, 32, 32)
 
 class Generator_CIFAR10(nn.Module):
-
     def __init__(self, latent_size):
         super(Generator_CIFAR10, self).__init__()
         self.latent_size = latent_size
@@ -456,7 +443,6 @@ class Generator_CIFAR10(nn.Module):
 
 
 class Encoder_CIFAR10(nn.Module):
-
     def __init__(self, latent_size, noise=False, do_spectral_norm=True):
         super(Encoder_CIFAR10, self).__init__()
         self.latent_size = latent_size
@@ -487,7 +473,6 @@ class Encoder_CIFAR10(nn.Module):
         )
 
     def forward(self, input):
-        batch_size = input.size()[0]
         x1 = self.main1(input)
         x2 = self.main2(x1)
         x3 = self.main3(x2)
@@ -496,7 +481,6 @@ class Encoder_CIFAR10(nn.Module):
 
 
 class Discriminator_xz_CIFAR10(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1, do_spectral_norm=True):
         super(Discriminator_xz_CIFAR10, self).__init__()
         self.latent_size = latent_size
@@ -547,7 +531,6 @@ class Discriminator_xz_CIFAR10(nn.Module):
 
 
 class Discriminator_xx_CIFAR10(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1, do_spectral_norm=True):
         super(Discriminator_xx_CIFAR10, self).__init__()
         self.latent_size = latent_size
@@ -575,7 +558,6 @@ class Discriminator_xx_CIFAR10(nn.Module):
 
 
 class Discriminator_zz_CIFAR10(nn.Module):
-
     def __init__(self, latent_size, dropout, output_size=1, do_spectral_norm=True):
         super(Discriminator_zz_CIFAR10, self).__init__()
         self.latent_size = latent_size
@@ -594,9 +576,9 @@ class Discriminator_zz_CIFAR10(nn.Module):
             SpectralNorm(nn.Linear(32, 1)),
             nn.LeakyReLU(self.leaky_value, inplace=True)
             )
+
     def forward(self, z, z_prime):
         z = torch.cat((z, z_prime), 0)
         itermediate_layer = self.joint_zz(z.view(z.shape[0], -1))
         logit = self.logit(itermediate_layer)
         return logit.squeeze(), itermediate_layer
-
