@@ -1,6 +1,8 @@
 # Unsupervised Anomaly Detection with a GAN Augmented Autoencoder 
 This work was accepted in the 29th International Conference on Artificial Neural Networks (ICANN2020)
 
+This repository includes Python codes for reproducing the results of our paper besides three other baselines referenced here.
+
 ## requirements:
 
 PyTorch 1.3
