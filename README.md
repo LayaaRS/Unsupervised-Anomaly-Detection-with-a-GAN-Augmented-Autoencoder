@@ -16,12 +16,12 @@ Scikit learn
 If you have found our work useful, please consider citing [our work](https://arxiv.org/abs/2112.15541)
 
 ```
-[@article{sevyeri2021effectiveness,
+@article{sevyeri2021effectiveness,
   title={on the effectiveness of generative adversarial network on anomaly detection},
   author={Sevyeri, Laya Rafiee and Fevens, Thomas},
   journal={arXiv preprint arXiv:2112.15541},
   year={2021}
-}]
+}
 ```
 
 For citing the [publication](https://link.springer.com/chapter/10.1007/978-3-030-61609-0_38):
